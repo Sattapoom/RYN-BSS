@@ -21,25 +21,30 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.solaryn-bss1.dev",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
         "icons/icon.ico"
-      ]
+      ],
+      "windows": {
+        "wix": {
+          "language": "zh-CN"
+        }
+      }
     },
     "security": {
       "csp": null
     },
     "windows": [
       {
-        "fullscreen": false,
+        "fullscreen": true,
         "resizable": false,
         "title": "Solaryn BSS.",
-        "width": 1366,
-        "height": 768
+        "width": 1920,
+        "height": 1080
       }
     ]
   }
