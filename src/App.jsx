@@ -140,9 +140,9 @@ function App() {
             Iavg = Iavg / Iavg_dv;
           }
 
-          let PV1 = inverter1.PV
-          let PV2 = inverter2.PV
-          let PV3 = inverter3.PV
+          let PV1 = inverter1.PV.V * inverter1.PV.I
+          let PV2 = inverter2.PV.V * inverter2.PV.I
+          let PV3 = inverter3.PV.V * inverter3.PV.I
 
           setVavg(Vavg.toFixed(2));
           setIavg(Iavg.toFixed(2));
@@ -165,7 +165,7 @@ function App() {
     datasets: [
       {
         label: 'PV',
-        data: [pv1.V * pv1.I, pv2.V * pv2.I, pv3.V * pv3.I],
+        data: [pv1, pv2, pv3],
         backgroundColor: 'rgba(251,214,38,255)',
       }
     ],
