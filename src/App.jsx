@@ -80,23 +80,75 @@ function App() {
   const [totalCon, setTotalCon] = useState(14);
   const [saving, setSaving] = useState(15);
 
-  const [posts, setPosts] = useState([]);
-  useEffect(() => {
-    fetch('http://127.0.0.1:1880/bss/status')
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setPosts(data);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  }, []);
-
   useEffect(() => {
     const intervalId = setInterval(() => {
 
-    }, 300);
+      fetch('http://127.0.0.1:1880/bss/status')
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          let inverters = data.inverters;
+          let smartLogger = data.smartLogger;
+
+          let inverter1 = inverters[0];
+          let inverter2 = inverters[1];
+          let inverter3 = inverters[2];
+
+          let inv1_Vavg = (inverter1.V[0] + inverter1.V[1] + inverter1.V[2])/3;
+          let inv2_Vavg = (inverter2.V[0] + inverter2.V[1] + inverter2.V[2])/3;
+          let inv3_Vavg = (inverter3.V[0] + inverter3.V[1] + inverter3.V[2])/3;
+
+          let inv1_Iavg = (inverter1.A[0] + inverter1.A[1] + inverter1.A[2])/3;
+          let inv2_Iavg = (inverter2.A[0] + inverter2.A[1] + inverter2.A[2])/3;
+          let inv3_Iavg = (inverter3.A[0] + inverter3.A[1] + inverter3.A[2])/3;
+
+          let Vavg = 0;
+          let Vavg_dv = 0;
+          if (inv1_Vavg > 1) {
+            Vavg_dv = Vavg_dv + 1;
+            Vavg = Vavg + inv1_Vavg;
+          }
+          if (inv2_Vavg > 1) {
+            Vavg_dv = Vavg_dv + 1;
+            Vavg = Vavg + inv2_Vavg;
+          }
+          if (inv3_Vavg > 1) {
+            Vavg_dv = Vavg_dv + 1;
+            Vavg = Vavg + inv3_Vavg;
+          }
+
+          if (Vavg_dv > 0) {
+            Vavg = Vavg / Vavg_dv;
+          }
+
+          let Iavg = 0;
+          let Iavg_dv = 0;
+          if (inv1_Iavg > 0) {
+            Iavg_dv = Iavg_dv + 1;
+            Iavg = Iavg + inv1_Iavg;
+          }
+          if (inv2_Iavg > 0) {
+            Iavg_dv = Iavg_dv + 1;
+            Iavg = Iavg + inv2_Iavg;
+          }
+          if (inv3_Iavg > 0) {
+            Iavg_dv = Iavg_dv + 1;
+            Iavg = Iavg + inv3_Iavg;
+          }
+
+          if (Iavg_dv > 0) {
+            Iavg = Iavg / Iavg_dv;
+          }
+
+          setVavg(Vavg);
+          setIavg(Iavg);
+
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+
+    }, 1500);
 
     return () => clearInterval(intervalId);
   }, []);
