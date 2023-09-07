@@ -140,8 +140,8 @@ function App() {
             Iavg = Iavg / Iavg_dv;
           }
 
-          setVavg(Vavg);
-          setIavg(Iavg);
+          setVavg(Vavg.toFixed(2));
+          setIavg(Iavg.toFixed(2));
 
         })
         .catch((err) => {
