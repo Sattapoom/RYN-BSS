@@ -63,10 +63,18 @@ const options = {
 
 function App() {
 
+  const FT = 0.6689;
+  const [status1, setStatus1] = useState("Waiting...")
+  const [status2, setStatus2] = useState("Waiting...")
+  const [status3, setStatus3] = useState("Waiting...")
   const [vavg, setVavg] = useState(1);
   const [iavg, setIavg] = useState(2);
-  const [ptot, setPtot] = useState(3);
-  const [etot, setEtot] = useState(4);
+  const [vA, setVA] = useState(2);
+  const [vB, setVB] = useState(2);
+  const [vC, setVC] = useState(2);
+  const [iA, setIA] = useState(2);
+  const [iB, setIB] = useState(2);
+  const [iC, setIC] = useState(2);
   const [pv1, setPV1] = useState(5);
   const [pv2, setPV2] = useState(6);
   const [pv3, setPV3] = useState(7);
@@ -76,9 +84,45 @@ function App() {
   const [temp1, setTemp1] = useState(10);
   const [temp2, setTemp2] = useState(11);
   const [temp3, setTemp3] = useState(12);
-  const [dailCon, setDailCon] = useState(13);
-  const [totalCon, setTotalCon] = useState(14);
-  const [saving, setSaving] = useState(15);
+  const [dailGen, setDailGen] = useState(13);
+  const [totalGen, setTotalGen] = useState(14);
+  const [saving, setSaving] = useState(17);
+
+  function checkStatus(statuscode, setStatus) {
+    if (statuscode == 0) {
+      setStatus("Standby");
+    } else if (statuscode == 1) {
+      setStatus("Starting")
+    } else if (statuscode <= 256) {
+      setStatus("Starting")
+    } else if (statuscode == 512) {
+      setStatus("On-grid")
+    } else if (statuscode == 513) {
+      setStatus("P-Limited")
+    } else if (statuscode == 514) {
+      setStatus("SelfDerate")
+    } else if (statuscode == 515) {
+      setStatus("Off-grid")
+    } else if (statuscode <= 786) {
+      setStatus("Fault")
+    } else if (statuscode <= 1029) {
+      setStatus("Scheduling")
+    } else if (statuscode <= 1281) {
+      setStatus("SpotChecke")
+    } else if (statuscode == 1536) {
+      setStatus("Inspecting")
+    } else if (statuscode == 1792) {
+      setStatus("SelfCheck")
+    } else if (statuscode == 2048) {
+      setStatus("I-Vscanning")
+    } else if (statuscode == 2304) {
+      setStatus("DCdetection")
+    } else if (statuscode == 2560) {
+      setStatus("OFFG Charge")
+    } else {
+      setStatus("No irradate")
+    }
+  }
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -121,6 +165,13 @@ function App() {
             Vavg = Vavg / Vavg_dv;
           }
 
+          let V_A = (inverter1.V[0] + inverter2.V[0] + inverter3.V[0]) / Vavg_dv;
+          let V_B = (inverter1.V[1] + inverter2.V[1] + inverter3.V[1]) / Vavg_dv;
+          let V_C = (inverter1.V[2] + inverter2.V[2] + inverter3.V[2]) / Vavg_dv;
+          setVA(V_A.toFixed(2));
+          setVB(V_B.toFixed(2));
+          setVC(V_C.toFixed(2));
+
           let Iavg = 0;
           let Iavg_dv = 0;
           if (inv1_Iavg > 0) {
@@ -140,16 +191,46 @@ function App() {
             Iavg = Iavg / Iavg_dv;
           }
 
+          let I_A = (inverter1.I[0] + inverter2.I[0] + inverter3.I[0]) / Iavg_dv;
+          let I_B = (inverter1.I[1] + inverter2.I[1] + inverter3.I[1]) / Iavg_dv;
+          let I_C = (inverter1.I[2] + inverter2.I[2] + inverter3.I[2]) / Iavg_dv;
+          setIA(I_A.toFixed(2));
+          setIB(I_B.toFixed(2));
+          setIC(I_C.toFixed(2));
+
           let PV1 = inverter1.PV.V * inverter1.PV.I
           let PV2 = inverter2.PV.V * inverter2.PV.I
           let PV3 = inverter3.PV.V * inverter3.PV.I
 
+          let soc2 = inverter2.SOC
+          let soc3 = inverter3.SOC
+
+          let inv1_temp = inverter1.T
+          let inv2_temp = inverter2.T
+          let inv3_temp = inverter3.T
+
+          let inv1_status = inverter1.STATUS
+          let inv2_status = inverter2.STATUS
+          let inv3_status = inverter3.STATUS
+
+          checkStatus(inv1_status, setStatus1);
+          checkStatus(inv2_status, setStatus2);
+          checkStatus(inv3_status, setStatus3);
+
           setVavg(Vavg.toFixed(2));
           setIavg(Iavg.toFixed(2));
-          setPV1(PV1);
-          setPV2(PV2);
-          setPV3(PV3);
+          setPV1(PV1.toFixed(2));
+          setPV2(PV2.toFixed(2));
+          setPV3(PV3.toFixed(2));
+          setBatt2(soc2);
+          setBatt3(soc3);
+          setTemp1(inv1_temp);
+          setTemp2(inv2_temp);
+          setTemp3(inv3_temp);
 
+          setDailGen(smartLogger.Eday.toFixed(2));
+          setTotalGen(smartLogger.Etot.toFixed(2));
+          setSaving((smartLogger.Etot * FT).toFixed(2))
         })
         .catch((err) => {
           console.log(err.message);
@@ -175,26 +256,42 @@ function App() {
     <div className="w-full h-full">
       <div className="absolute top-[565px] left-[50px] w-[194px] h-[266px] text-yellow-text">
         <div className="h-[40px] flex items-center text-2xl px-3">Grid</div>
-        <div className="h-[226px] flex-col space-y-5 p-3">
+        <div className="h-[226px] flex-col space-y-1 px-3 py-1">
           <div class="flex justify-between">
-            Vavg:
+            Vavg :
             <p class="text-white">{vavg}</p>
             V
           </div>
           <div class="flex justify-between">
-            Aavg:
+            Aavg :
             <p class="text-white">{iavg}</p>
             A
           </div>
           <div class="flex justify-between">
-            Ptot:
-            <p class="text-white">{ptot}</p>
-            kW
+            <pre>V-A  :</pre>
+            <p class="text-white">{vA}</p>
+            V
+          </div><div class="flex justify-between">
+            <pre>V-B  :</pre>
+            <p class="text-white">{vB}</p>
+            V
+          </div><div class="flex justify-between">
+            <pre>V-C  :</pre>
+            <p class="text-white">{vC}</p>
+            V
           </div>
-          <div class="flex justify-between pt-12">
-            Etot:
-            <p class="text-white">{etot}</p>
-            kWh
+          <div class="flex justify-between">
+            <pre>I-A  :</pre>
+            <p class="text-white">{iA}</p>
+            A
+          </div><div class="flex justify-between">
+            <pre>I-B  :</pre>
+            <p class="text-white">{iB}</p>
+            A
+          </div><div class="flex justify-between">
+            <pre>I-C  :</pre>
+            <p class="text-white">{iC}</p>
+            A
           </div>
         </div>
       </div>
@@ -208,9 +305,13 @@ function App() {
 
       <div className="absolute top-[40px] left-[889px] w-[190px] h-[158px] text-yellow-text">
         <div className="h-[40px] flex items-center text-2xl px-2"><p>Inverter <span class="text-white">No.1</span></p></div>
-        <div className="h-[226px] flex-col space-y-0 px-4">
+        <div className="h-[226px] flex-col space-y-1 px-4">
           <div class="flex justify-between">
-            <pre>PV  :</pre>
+            <pre>Status</pre>
+            <p class="text-white">{status1}</p>
+          </div>
+          <div class="flex justify-between">
+            <pre>PV   :</pre>
             <p class="text-white">{pv1}</p>
             W
           </div>
@@ -220,7 +321,7 @@ function App() {
             {batt1}
           </div>
           <div class="flex justify-between">
-            Temp:
+            Temp   :
             <p class="text-white">{temp1}</p>
             ํC
           </div>
@@ -228,9 +329,13 @@ function App() {
       </div>
       <div className="absolute top-[40px] left-[1093.5px] w-[190px] h-[158px] text-yellow-text">
         <div className="h-[40px] flex items-center text-2xl px-2"><p>Inverter <span class="text-white">No.2</span></p></div>
-        <div className="h-[226px] flex-col space-y-0 px-4">
+        <div className="h-[226px] flex-col space-y-1 px-4">
           <div class="flex justify-between">
-            <pre>PV  :</pre>
+            <pre>Status</pre>
+            <p class="text-white">{status2}</p>
+          </div>
+          <div class="flex justify-between">
+            <pre>PV   :</pre>
             <p class="text-white">{pv2}</p>
             W
           </div>
@@ -240,7 +345,7 @@ function App() {
             %
           </div>
           <div class="flex justify-between">
-            Temp:
+            Temp   :
             <p class="text-white">{temp2}</p>
             ํC
           </div>
@@ -248,9 +353,13 @@ function App() {
       </div>
       <div className="absolute top-[40px] left-[1296px] w-[190px] h-[158px] text-yellow-text">
         <div className="h-[40px] flex items-center text-2xl px-2"><p>Inverter <span class="text-white">No.3</span></p></div>
-        <div className="h-[226px] flex-col space-y-0 px-4">
+        <div className="h-[226px] flex-col space-y-1 px-4">
           <div class="flex justify-between">
-            <pre>PV  :</pre>
+            <pre>Status</pre>
+            <p class="text-white">{status3}</p>
+          </div>
+          <div class="flex justify-between">
+            <pre>PV   :</pre>
             <p class="text-white">{pv3}</p>
             W
           </div>
@@ -260,7 +369,7 @@ function App() {
             %
           </div>
           <div class="flex justify-between">
-            Temp:
+            Temp   :
             <p class="text-white">{temp3}</p>
             ํC
           </div>
@@ -268,20 +377,20 @@ function App() {
       </div>
 
       <div className="absolute top-[420px] left-[1195px] w-[300px] h-[247px] text-yellow-text">
-        <div className="h-[70px] ps-2 flex items-center"><div><p className="text-2xl">Power Consumption</p><p className="text-white text-xs font-bold">Kung Krabane Bay Royal Development project</p></div></div>
-        <div className="h-[177px] flex-col space-y-4 p-2 text-xl">
+        <div className="h-[70px] ps-2 flex items-center"><div><p className="text-2xl">Energy Analytics</p><p className="text-white text-xs font-bold">Kung Krabane Bay Royal Development project</p></div></div>
+        <div className="h-[177px] flex-col space-y-3 p-2 text-lg">
           <div class="flex justify-between">
-            <pre className="bg-yellow-bg text-black rounded-md px-2">Daily Usage  </pre>
-            <p class="text-white">{dailCon}</p>
+            <pre className="bg-yellow-bg text-black rounded-md px-2 py-2">Generated Today</pre>
+            <p class="text-white">{dailGen}</p>
             kWh
           </div>
           <div class="flex justify-between">
-            <pre className="bg-yellow-bg text-black rounded-md px-2">Totally Usage</pre>
-            <p class="text-white">{totalCon}</p>
+            <pre className="bg-yellow-bg text-black rounded-md px-2 py-2">Total Generated</pre>
+            <p class="text-white">{totalGen}</p>
             kWh
           </div>
           <div class="flex justify-between">
-            <pre className="bg-yellow-bg text-black rounded-md px-2">Total savings</pre>
+            <pre className="bg-yellow-bg text-black rounded-md px-2 py-2">Total Savings  </pre>
             <p class="text-white">{saving}</p>
             ฿
           </div>
