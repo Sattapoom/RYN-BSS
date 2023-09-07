@@ -87,6 +87,7 @@ function App() {
   const [dailGen, setDailGen] = useState(13);
   const [totalGen, setTotalGen] = useState(14);
   const [saving, setSaving] = useState(17);
+  const [bgMode, setBgMode] = useState(0);
 
   function checkStatus(statuscode, setStatus) {
     if (statuscode == 0) {
@@ -201,6 +202,14 @@ function App() {
           let PV1 = inverter1.PV.V * inverter1.PV.I
           let PV2 = inverter2.PV.V * inverter2.PV.I
           let PV3 = inverter3.PV.V * inverter3.PV.I
+
+          if ((inverter1.PV.V < 600) && (inverter2.PV.V < 600) && (inverter3.PV.V < 600)) {
+            setBgMode(1)
+          } else if ((inverter1.PV.V + inverter2.PV.V + inverter3.PV.V) >= 1800) {
+            setBgMode(2)
+          } else {
+            setBgMode(0)
+          }
 
           let soc2 = inverter2.SOC
           let soc3 = inverter3.SOC
@@ -396,7 +405,9 @@ function App() {
           </div>
         </div>
       </div>
-      <video src={Video_Full} autoPlay loop muted />
+      {bgMode == 0 ? <video src={Video_Full} autoPlay loop muted /> :
+        bgMode == 1 ? <video src={Grid_Only} autoPlay loop muted /> :
+          <video src={PV_Only} autoPlay loop muted />}
     </div>
   );
 }
