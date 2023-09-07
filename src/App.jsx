@@ -94,13 +94,13 @@ function App() {
           let inverter2 = inverters[1];
           let inverter3 = inverters[2];
 
-          let inv1_Vavg = (inverter1.V[0] + inverter1.V[1] + inverter1.V[2])/3;
-          let inv2_Vavg = (inverter2.V[0] + inverter2.V[1] + inverter2.V[2])/3;
-          let inv3_Vavg = (inverter3.V[0] + inverter3.V[1] + inverter3.V[2])/3;
+          let inv1_Vavg = (inverter1.V[0] + inverter1.V[1] + inverter1.V[2]) / 3;
+          let inv2_Vavg = (inverter2.V[0] + inverter2.V[1] + inverter2.V[2]) / 3;
+          let inv3_Vavg = (inverter3.V[0] + inverter3.V[1] + inverter3.V[2]) / 3;
 
-          let inv1_Iavg = (inverter1.A[0] + inverter1.A[1] + inverter1.A[2])/3;
-          let inv2_Iavg = (inverter2.A[0] + inverter2.A[1] + inverter2.A[2])/3;
-          let inv3_Iavg = (inverter3.A[0] + inverter3.A[1] + inverter3.A[2])/3;
+          let inv1_Iavg = (inverter1.I[0] + inverter1.I[1] + inverter1.I[2]) / 3;
+          let inv2_Iavg = (inverter2.I[0] + inverter2.I[1] + inverter2.I[2]) / 3;
+          let inv3_Iavg = (inverter3.I[0] + inverter3.I[1] + inverter3.I[2]) / 3;
 
           let Vavg = 0;
           let Vavg_dv = 0;
@@ -140,8 +140,15 @@ function App() {
             Iavg = Iavg / Iavg_dv;
           }
 
+          let PV1 = inverter1.PV
+          let PV2 = inverter2.PV
+          let PV3 = inverter3.PV
+
           setVavg(Vavg.toFixed(2));
           setIavg(Iavg.toFixed(2));
+          setPV1(PV1);
+          setPV2(PV2);
+          setPV3(PV3);
 
         })
         .catch((err) => {
@@ -158,7 +165,7 @@ function App() {
     datasets: [
       {
         label: 'PV',
-        data: [pv1, pv2, pv3],
+        data: [pv1.V * pv1.I, pv2.V * pv2.I, pv3.V * pv3.I],
         backgroundColor: 'rgba(251,214,38,255)',
       }
     ],
