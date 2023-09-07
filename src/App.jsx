@@ -63,15 +63,41 @@ const options = {
 
 function App() {
 
-  const [panals, setPanals] = useState([500,400,300]);
+  const [vavg, setVavg] = useState(1);
+  const [iavg, setIavg] = useState(2);
+  const [ptot, setPtot] = useState(3);
+  const [etot, setEtot] = useState(4);
+  const [pv1, setPV1] = useState(5);
+  const [pv2, setPV2] = useState(6);
+  const [pv3, setPV3] = useState(7);
+  const [batt1, setBatt1] = useState("No Battery");
+  const [batt2, setBatt2] = useState(8);
+  const [batt3, setBatt3] = useState(9);
+  const [temp1, setTemp1] = useState(10);
+  const [temp2, setTemp2] = useState(11);
+  const [temp3, setTemp3] = useState(12);
+  const [dailCon, setDailCon] = useState(13);
+  const [totalCon, setTotalCon] = useState(14);
+  const [saving, setSaving] = useState(15);
+
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    fetch('http://127.0.0.1:1880/bss/status')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setPosts(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      // Increment the count by 1 and update the state
-      setPanals((prevCount) => [prevCount[0] + 0.25,prevCount[1] + 0.5,prevCount[2] + 0.75]);
-    }, 300); // 2000 milliseconds = 2 seconds
 
-    // Clean up the interval when the component unmounts
+    }, 300);
+
     return () => clearInterval(intervalId);
   }, []);
 
@@ -80,7 +106,7 @@ function App() {
     datasets: [
       {
         label: 'PV',
-        data: panals,
+        data: [pv1, pv2, pv3],
         backgroundColor: 'rgba(251,214,38,255)',
       }
     ],
@@ -93,22 +119,22 @@ function App() {
         <div className="h-[226px] flex-col space-y-5 p-3">
           <div class="flex justify-between">
             Vavg:
-            <p class="text-white">213.51</p>
+            <p class="text-white">{vavg}</p>
             V
           </div>
           <div class="flex justify-between">
             Aavg:
-            <p class="text-white">89.41</p>
+            <p class="text-white">{iavg}</p>
             A
           </div>
           <div class="flex justify-between">
             Ptot:
-            <p class="text-white">00.00</p>
+            <p class="text-white">{ptot}</p>
             kW
           </div>
           <div class="flex justify-between pt-12">
             Etot:
-            <p class="text-white">00.00</p>
+            <p class="text-white">{etot}</p>
             kWh
           </div>
         </div>
@@ -126,17 +152,17 @@ function App() {
         <div className="h-[226px] flex-col space-y-0 px-4">
           <div class="flex justify-between">
             <pre>PV  :</pre>
-            <p class="text-white">100.02</p>
+            <p class="text-white">{pv1}</p>
             W
           </div>
           <div class="flex justify-between">
             <pre>BATT :</pre>
             <p class="text-white"></p>
-            No Battery
+            {batt1}
           </div>
           <div class="flex justify-between">
             Temp:
-            <p class="text-white">00.00</p>
+            <p class="text-white">{temp1}</p>
             ํC
           </div>
         </div>
@@ -146,17 +172,17 @@ function App() {
         <div className="h-[226px] flex-col space-y-0 px-4">
           <div class="flex justify-between">
             <pre>PV  :</pre>
-            <p class="text-white">30.02</p>
+            <p class="text-white">{pv2}</p>
             W
           </div>
           <div class="flex justify-between">
             <pre>BATT :</pre>
-            <p class="text-white">51.00</p>
+            <p class="text-white">{batt2}</p>
             %
           </div>
           <div class="flex justify-between">
             Temp:
-            <p class="text-white">00.00</p>
+            <p class="text-white">{temp2}</p>
             ํC
           </div>
         </div>
@@ -166,17 +192,17 @@ function App() {
         <div className="h-[226px] flex-col space-y-0 px-4">
           <div class="flex justify-between">
             <pre>PV  :</pre>
-            <p class="text-white">100.02</p>
+            <p class="text-white">{pv3}</p>
             W
           </div>
           <div class="flex justify-between">
             <pre>BATT :</pre>
-            <p class="text-white">38.31</p>
+            <p class="text-white">{batt3}</p>
             %
           </div>
           <div class="flex justify-between">
             Temp:
-            <p class="text-white">00.00</p>
+            <p class="text-white">{temp3}</p>
             ํC
           </div>
         </div>
@@ -187,17 +213,17 @@ function App() {
         <div className="h-[177px] flex-col space-y-4 p-2 text-xl">
           <div class="flex justify-between">
             <pre className="bg-yellow-bg text-black rounded-md px-2">Daily Usage  </pre>
-            <p class="text-white">00.00</p>
+            <p class="text-white">{dailCon}</p>
             kWh
           </div>
           <div class="flex justify-between">
             <pre className="bg-yellow-bg text-black rounded-md px-2">Totally Usage</pre>
-            <p class="text-white">00.00</p>
+            <p class="text-white">{totalCon}</p>
             kWh
           </div>
           <div class="flex justify-between">
             <pre className="bg-yellow-bg text-black rounded-md px-2">Total savings</pre>
-            <p class="text-white">00.00</p>
+            <p class="text-white">{saving}</p>
             ฿
           </div>
         </div>
