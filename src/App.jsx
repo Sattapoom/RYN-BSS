@@ -239,7 +239,7 @@ function App() {
 
           setDailGen(smartLogger.Eday.toFixed(2));
           setTotalGen(smartLogger.Etot.toFixed(2));
-          setSaving((smartLogger.Etot * FT).toFixed(2))
+          setSaving((smartLogger.Etot * 5 * FT * 1.07).toFixed(2))
         })
         .catch((err) => {
           console.log(err.message);
